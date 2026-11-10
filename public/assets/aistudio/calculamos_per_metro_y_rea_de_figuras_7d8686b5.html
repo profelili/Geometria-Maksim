@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculamos Perímetro y área de figuras - 7mo Grado</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .font-fredoka {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .math-input {
+            width: 5rem;
+            text-align: center;
+            border-bottom: 2px solid #4b5563;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .math-input:focus {
+            border-bottom-color: #2563eb;
+            background-color: #eff6ff;
+        }
+        .correct-input {
+            background-color: #d1fae5 !important;
+            border-color: #059669 !important;
+            color: #065f46;
+            font-weight: bold;
+        }
+        .incorrect-input {
+            background-color: #fee2e2 !important;
+            border-color: #dc2626 !important;
+            color: #991b1b;
+            font-weight: bold;
+        }
+        .sheet-shadow {
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+        .avatar-option {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .avatar-option:hover {
+            transform: scale(1.1);
+        }
+        .avatar-selected {
+            ring-width: 4px;
+            ring-color: #4f46e5;
+            transform: scale(1.1);
+            border-color: #4f46e5;
+        }
+        .visual-card {
+            background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+            border: 1px solid #c7d2fe;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16 text-slate-800">
+
+    <!-- Header Sticky Navbar -->
+    <header class="bg-indigo-600 text-white sticky top-0 z-50 shadow-md">
+        <div class="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-shapes text-2xl text-yellow-300"></i>
+                <div>
+                    <h1 class="font-fredoka text-lg md:text-2xl font-bold tracking-wide leading-tight">Matemáticas Maksim - 7mo</h1>
+                    <p class="text-xs text-indigo-200">Calculamos Perímetro y área de figuras (Págs. 198 a 211)</p>
+                </div>
+            </div>
+            
+            <!-- Student Header Badge -->
+            <div class="flex items-center space-x-3">
+                <div id="student-badge" class="hidden flex items-center bg-indigo-700 rounded-full px-3 py-1 border border-indigo-400">
+                    <span id="active-avatar" class="text-xl mr-2">🧑‍🎓</span>
+                    <div class="text-left leading-tight hidden sm:block">
+                        <div id="active-name" class="font-bold text-sm text-yellow-300">Estudiante</div>
+                        <div id="active-course" class="text-xs text-indigo-200">7mo Grado</div>
+                    </div>
+                </div>
+
+                <div id="score-badge" class="hidden bg-yellow-400 text-slate-900 font-bold px-4 py-1.5 rounded-full text-lg shadow">
+                    Nota: <span id="final-score-val">0</span> / 10
+                </div>
+
+                <button onclick="toggleTeacherDashboard()" class="bg-indigo-800 hover:bg-indigo-900 text-indigo-100 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center space-x-1.5 border border-indigo-500 transition">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                    <span class="hidden md:inline">Panel Docente</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="max-w-4xl mx-auto mt-6 px-4">
+
+        <!-- SECTION: Teacher Dashboard (Toggleable) -->
+        <div id="teacher-dashboard" class="hidden bg-slate-900 text-white rounded-2xl p-6 mb-8 sheet-shadow border-t-8 border-yellow-400">
+            <div class="flex justify-between items-center mb-4 pb-3 border-b border-slate-700">
+                <div class="flex items-center space-x-3">
+                    <div class="bg-yellow-400 text-slate-900 p-2.5 rounded-xl text-xl font-bold">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-fredoka text-xl font-bold text-yellow-400">Historial y Planilla de Notas (Docente)</h2>
+                        <p class="text-slate-400 text-xs">Registro automático en tiempo real de todos los exámenes enviados.</p>
+                    </div>
+                </div>
+                <button onclick="toggleTeacherDashboard()" class="text-slate-400 hover:text-white text-sm bg-slate-800 px-3 py-1 rounded-lg">
+                    Cerrar Panel
+                </button>
+            </div>
+
+            <div id="dashboard-loading" class="text-center py-6 text-slate-400 text-sm">
+                <i class="fa-solid fa-circle-notch fa-spin text-2xl text-yellow-400 mb-2"></i>
+                <p>Cargando calificaciones guardadas...</p>
+            </div>
+
+            <div id="dashboard-table-container" class="hidden overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-800 text-slate-300 border-b border-slate-700">
+                            <th class="p-3">Estudiante</th>
+                            <th class="p-3">Grado/Sección</th>
+                            <th class="p-3">Fecha y Hora</th>
+                            <th class="p-3">Aciertos</th>
+                            <th class="p-3 text-right">Nota Final</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dashboard-tbody" class="divide-y divide-slate-800">
+                        <!-- Dynamic Records -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- SECTION 0: Perfil del Estudiante -->
+        <div id="profile-card" class="bg-white rounded-2xl p-6 mb-8 sheet-shadow border-t-8 border-indigo-600 transition-all">
+            <div id="profile-form-container">
+                <div class="flex items-center space-x-3 mb-4">
+                    <div class="bg-indigo-100 text-indigo-700 p-2.5 rounded-xl text-xl">
+                        <i class="fa-solid fa-id-card"></i>
+                    </div>
+                    <div>
+                        <h2 class="font-fredoka text-2xl font-bold text-indigo-900">Perfil del Estudiante</h2>
+                        <p class="text-slate-500 text-sm">Completa tus datos y elegí tu avatar para comenzar la ficha interactiva.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <!-- Data Inputs -->
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="student-name-input">
+                                <i class="fa-solid fa-user text-indigo-500 mr-1"></i> Nombre y Apellido:
+                            </label>
+                            <input type="text" id="student-name-input" placeholder="Ej. Sofía Martínez" 
+                                   oninput="updateStudentProfile()"
+                                   class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 mb-1" for="student-course-input">
+                                <i class="fa-solid fa-school text-indigo-500 mr-1"></i> Grado / Sección:
+                            </label>
+                            <select id="student-course-input" onchange="updateStudentProfile()"
+                                    class="w-full px-4 py-2 border border-slate-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition bg-white">
+                                <option value="7mo A">7mo Grado - División A</option>
+                                <option value="7mo B">7mo Grado - División B</option>
+                                <option value="7mo C">7mo Grado - División C</option>
+                                <option value="7mo Única">7mo Grado - Sección Única</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Avatar Selection -->
+                    <div>
+                        <label class="block text-sm font-semibold text-slate-700 mb-2">
+                            <i class="fa-solid fa-icons text-indigo-500 mr-1"></i> Elige tu Avatar:
+                        </label>
+                        <div class="grid grid-cols-5 gap-3 p-3 bg-slate-50 rounded-xl border border-slate-200" id="avatar-picker">
+                            <button type="button" onclick="selectAvatar('🧑‍🎓', this)" class="avatar-option text-3xl p-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center avatar-selected">🧑‍🎓</button>
+                            <button type="button" onclick="selectAvatar('📐', this)" class="avatar-option text-3xl p-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center">📐</button>
+                            <button type="button" onclick="selectAvatar('🚀', this)" class="avatar-option text-3xl p-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center">🚀</button>
+                            <button type="button" onclick="selectAvatar('🦉', this)" class="avatar-option text-3xl p-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center">🦉</button>
+                            <button type="button" onclick="selectAvatar('🤖', this)" class="avatar-option text-3xl p-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center">🤖</button>
+                            <button type="button" onclick="selectAvatar('🟩', this)" class="avatar-option text-3xl p-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center">🟩</button>
+                            <button type="button" onclick="selectAvatar('🧩', this)" class="avatar-option text-3xl p-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center">🧩</button>
+                            <button type="button" onclick="selectAvatar('🦄', this)" class="avatar-option text-3xl p-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center">🦄</button>
+                            <button type="button" onclick="selectAvatar('🔵', this)" class="avatar-option text-3xl p-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center">🔵</button>
+                            <button type="button" onclick="selectAvatar('🎨', this)" class="avatar-option text-3xl p-2 rounded-xl bg-white border border-slate-200 shadow-sm text-center">🎨</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 text-center">
+                    <button type="button" onclick="confirmProfile()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-fredoka text-lg px-6 py-2.5 rounded-xl shadow-md transition transform hover:-translate-y-0.5 inline-flex items-center space-x-2">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>Confirmar Perfil y Comenzar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Profile Summary View (Collapsed State) -->
+            <div id="profile-summary-container" class="hidden flex items-center justify-between">
+                <div class="flex items-center space-x-4">
+                    <span id="summary-avatar" class="text-4xl bg-indigo-50 p-2 rounded-2xl border border-indigo-100">🧑‍🎓</span>
+                    <div>
+                        <h3 id="summary-name" class="font-fredoka text-xl font-bold text-indigo-950">Estudiante</h3>
+                        <p id="summary-course" class="text-sm font-medium text-slate-500">7mo Grado</p>
+                    </div>
+                </div>
+                <button type="button" onclick="editProfile()" class="text-indigo-600 hover:text-indigo-800 text-sm font-semibold flex items-center space-x-1 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    <span>Editar Perfil</span>
+                </button>
+            </div>
+        </div>
+
+        <form id="worksheet-form" onsubmit="return false;">
+
+            <!-- SECCIÓN 1: Pentaminós, Perímetro y Área I -->
+            <section class="bg-white rounded-2xl p-6 mb-8 sheet-shadow">
+                <div class="flex items-center space-x-3 border-b pb-3 mb-4">
+                    <span class="bg-indigo-100 text-indigo-800 font-bold px-3 py-1 rounded-lg text-sm">Págs. 198-199</span>
+                    <h3 class="font-fredoka text-xl font-bold text-slate-800">1. Pentaminós, Perímetro y Área I</h3>
+                </div>
+
+                <!-- AYUDA VISUAL INTERACTIVA - PENTAMINÓS -->
+                <div class="visual-card rounded-xl p-4 mb-5">
+                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleHelp('help-pentamino')">
+                        <span class="font-fredoka text-indigo-900 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-lightbulb text-yellow-500"></i> Ayuda Visual e Ilustración Gráfica (Pentaminó)
+                        </span>
+                        <span class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-full font-semibold">Ver / Ocultar gráfico</span>
+                    </div>
+                    <div id="help-pentamino" class="mt-3 pt-3 border-t border-indigo-200 text-sm text-indigo-950 space-y-3">
+                        <p>Un <strong>Pentaminó</strong> está formado por 5 cuadraditos idénticos ($1\text{ u}^2$ cada uno).</p>
+                        <div class="flex flex-wrap items-center justify-center gap-6 py-2">
+                            <!-- SVG Ficha Pentaminó L -->
+                            <div class="flex flex-col items-center">
+                                <svg width="100" height="100" class="drop-shadow">
+                                    <rect x="10" y="10" width="20" height="20" fill="#6366f1" stroke="#312e81" stroke-width="1.5"/>
+                                    <rect x="10" y="30" width="20" height="20" fill="#6366f1" stroke="#312e81" stroke-width="1.5"/>
+                                    <rect x="10" y="50" width="20" height="20" fill="#6366f1" stroke="#312e81" stroke-width="1.5"/>
+                                    <rect x="10" y="70" width="20" height="20" fill="#6366f1" stroke="#312e81" stroke-width="1.5"/>
+                                    <rect x="30" y="70" width="20" height="20" fill="#6366f1" stroke="#312e81" stroke-width="1.5"/>
+                                </svg>
+                                <span class="text-xs font-semibold mt-1">Ficha L ($5\text{ cuadraditos}$)</span>
+                            </div>
+                            <!-- Rectángulo 10x6 -->
+                            <div class="bg-white p-3 rounded-lg border border-indigo-200 text-xs">
+                                <p class="font-bold text-indigo-900 mb-1">Rectángulo $10 \times 6$:</p>
+                                <p>• <strong>Área Total:</strong> $10 \text{ base} \times 6 \text{ altura} = 60 \text{ cuadraditos}$.</p>
+                                <p>• <strong>Perímetro Total:</strong> $10 + 6 + 10 + 6 = 32 \text{ lados}$.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ejercicio 1.1 -->
+                <div class="mb-6 bg-slate-50 p-4 rounded-xl">
+                    <p class="font-semibold text-slate-700 mb-2">1. Pentaminós y sus propiedades:</p>
+                    <p class="text-sm text-slate-600 mb-3">Los pentaminós son fichas compuestas por 5 cuadraditos iguales unidos por sus lados.</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm">a) ¿Cuántos cuadraditos integran cada ficha de pentaminó?</span>
+                            <input type="text" data-ans="5" class="math-input bg-transparent" placeholder="cant.">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm">b) Si construimos un rectángulo de $10 \times 6$ cuadraditos usando pentaminós, ¿cuál es su área total expresada en cuadraditos?</span>
+                            <input type="text" data-ans="60" class="math-input bg-transparent" placeholder="área">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-sm">c) ¿Cuál es el perímetro de un rectángulo de $10 \times 6$ cuadraditos?</span>
+                            <input type="text" data-ans="32" class="math-input bg-transparent" placeholder="perímetro">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: Conversiones y Unidades de Superficie -->
+            <section class="bg-white rounded-2xl p-6 mb-8 sheet-shadow">
+                <div class="flex items-center space-x-3 border-b pb-3 mb-4">
+                    <span class="bg-indigo-100 text-indigo-800 font-bold px-3 py-1 rounded-lg text-sm">Págs. 201-202</span>
+                    <h3 class="font-fredoka text-xl font-bold text-slate-800">2. Medir superficies usando el metro cuadrado y hectáreas</h3>
+                </div>
+
+                <!-- AYUDA VISUAL INTERACTIVA - UNIDADES -->
+                <div class="visual-card rounded-xl p-4 mb-5">
+                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleHelp('help-units')">
+                        <span class="font-fredoka text-indigo-900 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-ruler-combined text-indigo-600"></i> Tabla de Conversión Gráfica y Escala de $m^2$
+                        </span>
+                        <span class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-full font-semibold">Ver / Ocultar gráfico</span>
+                    </div>
+                    <div id="help-units" class="mt-3 pt-3 border-t border-indigo-200 text-sm text-indigo-950 space-y-2">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-center">
+                            <div class="bg-white p-2.5 rounded-lg border border-indigo-200">
+                                <div class="font-bold text-indigo-700">1 m²</div>
+                                <div class="text-xs text-slate-600">Cuadrado de $1\text{m} \times 1\text{m}$</div>
+                                <div class="text-xs font-semibold text-emerald-600 mt-1">= 10.000 cm²</div>
+                            </div>
+                            <div class="bg-white p-2.5 rounded-lg border border-indigo-200">
+                                <div class="font-bold text-indigo-700">1 Hectárea (1 ha)</div>
+                                <div class="text-xs text-slate-600">Cuadrado de $100\text{m} \times 100\text{m}$</div>
+                                <div class="text-xs font-semibold text-emerald-600 mt-1">= 10.000 m²</div>
+                            </div>
+                            <div class="bg-white p-2.5 rounded-lg border border-indigo-200">
+                                <div class="font-bold text-indigo-700">1 km²</div>
+                                <div class="text-xs text-slate-600">Cuadrado de $1000\text{m} \times 1000\text{m}$</div>
+                                <div class="text-xs font-semibold text-emerald-600 mt-1">= 1.000.000 m²</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-6 bg-slate-50 p-4 rounded-xl">
+                    <p class="font-semibold text-slate-700 mb-3">Completá las siguientes equivalencias de superficie:</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="flex items-center space-x-2">
+                            <span>a) $1\text{ m}^2 = $</span>
+                            <input type="text" data-ans="10000" class="math-input w-28 bg-transparent" placeholder="cm²">
+                            <span>$\text{cm}^2$</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span>b) $1\text{ km}^2 = $</span>
+                            <input type="text" data-ans="1000000" class="math-input w-28 bg-transparent" placeholder="m²">
+                            <span>$\text{m}^2$</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span>c) Un terreno de $100\text{ m} \times 100\text{ m}$ equivale a $1\text{ ha} = $</span>
+                            <input type="text" data-ans="10000" class="math-input w-28 bg-transparent" placeholder="m²">
+                            <span>$\text{m}^2$</span>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span>d) Un campo de $200\text{ m} \times 300\text{ m}$ equivale a:</span>
+                            <input type="text" data-ans="6" class="math-input bg-transparent" placeholder="ha">
+                            <span>$\text{ha}$</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 3: Área del Paralelogramo -->
+            <section class="bg-white rounded-2xl p-6 mb-8 sheet-shadow">
+                <div class="flex items-center space-x-3 border-b pb-3 mb-4">
+                    <span class="bg-indigo-100 text-indigo-800 font-bold px-3 py-1 rounded-lg text-sm">Págs. 204-205</span>
+                    <h3 class="font-fredoka text-xl font-bold text-slate-800">3. Área del Paralelogramo ($A = b \times h$)</h3>
+                </div>
+
+                <!-- AYUDA VISUAL INTERACTIVA - PARALELOGRAMO -->
+                <div class="visual-card rounded-xl p-4 mb-5">
+                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleHelp('help-paralelogramo')">
+                        <span class="font-fredoka text-indigo-900 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-draw-polygon text-indigo-600"></i> Explicación Gráfica: Transformación a Rectángulo
+                        </span>
+                        <span class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-full font-semibold">Ver / Ocultar gráfico</span>
+                    </div>
+                    <div id="help-paralelogramo" class="mt-3 pt-3 border-t border-indigo-200 text-sm text-indigo-950 flex flex-col md:flex-row items-center justify-around gap-4">
+                        <svg width="220" height="90" class="drop-shadow bg-white p-2 rounded-lg border border-indigo-100">
+                            <!-- Paralelogramo original con recorte en trazo punteado -->
+                            <polygon points="10,70 50,20 170,20 130,70" fill="#c7d2fe" stroke="#4338ca" stroke-width="2"/>
+                            <!-- Línea de altura h -->
+                            <line x1="50" y1="20" x2="50" y2="70" stroke="#ef4444" stroke-width="2" stroke-dasharray="4"/>
+                            <text x="55" y="50" fill="#ef4444" font-size="12" font-weight="bold">h (altura)</text>
+                            <text x="80" y="85" fill="#1e1b4b" font-size="12" font-weight="bold">b (base)</text>
+                        </svg>
+                        <div class="text-xs text-slate-700 bg-white p-3 rounded-lg border border-indigo-200 max-w-md">
+                            <p class="font-bold text-indigo-900 mb-1">Fórmula: $\text{Área} = \text{base} \times \text{altura} \quad (A = b \times h)$</p>
+                            <p>Si recortás el triángulo de la izquierda y lo pegás a la derecha, obtendrás un rectángulo equivalente con la misma base ($b$) y misma altura ($h$).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl mb-6">
+                    <p class="font-semibold text-slate-700 mb-3">Calculá las siguientes áreas de paralelogramos:</p>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-64 font-medium">a) Base = $5\text{ cm}$, Altura = $3\text{ cm}$ $\rightarrow$ Área:</span>
+                            <input type="text" data-ans="15" class="math-input bg-transparent" placeholder="cm²">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="w-64 font-medium">b) Base = $24\text{ cm}$, Altura = $\frac{1}{4}$ de la base $\rightarrow$ Área:</span>
+                            <input type="text" data-ans="144" class="math-input bg-transparent" placeholder="cm²">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="w-64 font-medium">c) Si el Área es $900\text{ cm}^2$ y la Base es $25\text{ cm}$, la Altura mide:</span>
+                            <input type="text" data-ans="36" class="math-input bg-transparent" placeholder="cm">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 4: Área del Trapecio -->
+            <section class="bg-white rounded-2xl p-6 mb-8 sheet-shadow">
+                <div class="flex items-center space-x-3 border-b pb-3 mb-4">
+                    <span class="bg-indigo-100 text-indigo-800 font-bold px-3 py-1 rounded-lg text-sm">Págs. 206-207</span>
+                    <h3 class="font-fredoka text-xl font-bold text-slate-800">4. Área del Trapecio ($A = \frac{(B+b) \times h}{2}$)</h3>
+                </div>
+
+                <!-- AYUDA VISUAL INTERACTIVA - TRAPECIO -->
+                <div class="visual-card rounded-xl p-4 mb-5">
+                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleHelp('help-trapecio')">
+                        <span class="font-fredoka text-indigo-900 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-shapes text-indigo-600"></i> Esquema Gráfico: Descomposición del Trapecio
+                        </span>
+                        <span class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-full font-semibold">Ver / Ocultar gráfico</span>
+                    </div>
+                    <div id="help-trapecio" class="mt-3 pt-3 border-t border-indigo-200 text-sm text-indigo-950 flex flex-col md:flex-row items-center justify-around gap-4">
+                        <svg width="240" height="95" class="drop-shadow bg-white p-2 rounded-lg border border-indigo-100">
+                            <!-- Trapecio -->
+                            <polygon points="50,20 170,20 210,75 30,75" fill="#ddd6fe" stroke="#6d28d9" stroke-width="2"/>
+                            <!-- Línea de altura -->
+                            <line x1="50" y1="20" x2="50" y2="75" stroke="#dc2626" stroke-width="2" stroke-dasharray="4"/>
+                            <text x="95" y="15" fill="#6d28d9" font-size="12" font-weight="bold">b (base menor)</text>
+                            <text x="85" y="90" fill="#6d28d9" font-size="12" font-weight="bold">B (base mayor)</text>
+                            <text x="55" y="52" fill="#dc2626" font-size="12" font-weight="bold">h</text>
+                        </svg>
+                        <div class="text-xs text-slate-700 bg-white p-3 rounded-lg border border-indigo-200 max-w-md">
+                            <p class="font-bold text-indigo-900 mb-1">Fórmula general: $A = \frac{(B + b) \cdot h}{2}$</p>
+                            <p>Sumamos la <strong>Base Mayor ($B$)</strong> más la <strong>Base Menor ($b$)</strong>, multiplicamos por la <strong>altura ($h$)</strong> y dividimos por $2$.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl mb-6">
+                    <p class="font-semibold text-slate-700 mb-3">Calculá el área de los siguientes trapecios:</p>
+                    <div class="space-y-4">
+                        <div class="flex items-center space-x-3">
+                            <span class="w-72 font-medium">a) Base Mayor = $12\text{ cm}$, Base Menor = $8\text{ cm}$, Altura = $7\text{ cm}$:</span>
+                            <input type="text" data-ans="70" class="math-input bg-transparent" placeholder="cm²">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="w-72 font-medium">b) Escenario: Base Mayor = $12\text{ m}$, Base Menor = $8\text{ m}$, Altura = $5\text{ m}$:</span>
+                            <input type="text" data-ans="50" class="math-input bg-transparent" placeholder="m²">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="w-72 font-medium">c) Si cada estudiante ocupa $1\text{ m}^2$, ¿cuántos caben en el escenario anterior?</span>
+                            <input type="text" data-ans="50" class="math-input bg-transparent" placeholder="alumnos">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 5: Área del Romboide -->
+            <section class="bg-white rounded-2xl p-6 mb-8 sheet-shadow">
+                <div class="flex items-center space-x-3 border-b pb-3 mb-4">
+                    <span class="bg-indigo-100 text-indigo-800 font-bold px-3 py-1 rounded-lg text-sm">Pág. 208</span>
+                    <h3 class="font-fredoka text-xl font-bold text-slate-800">5. Área del Romboide ($A = \frac{D \times d}{2}$)</h3>
+                </div>
+
+                <!-- AYUDA VISUAL INTERACTIVA - ROMBOIDE -->
+                <div class="visual-card rounded-xl p-4 mb-5">
+                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleHelp('help-romboide')">
+                        <span class="font-fredoka text-indigo-900 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-gem text-indigo-600"></i> Gráfico Interactivo: El Romboide y el Rectángulo Envolvente
+                        </span>
+                        <span class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-full font-semibold">Ver / Ocultar gráfico</span>
+                    </div>
+                    <div id="help-romboide" class="mt-3 pt-3 border-t border-indigo-200 text-sm text-indigo-950 flex flex-col md:flex-row items-center justify-around gap-4">
+                        <svg width="180" height="110" class="drop-shadow bg-white p-2 rounded-lg border border-indigo-100">
+                            <!-- Rectángulo envolvente -->
+                            <rect x="20" y="10" width="140" height="90" fill="none" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="4"/>
+                            <!-- Romboide inscripto -->
+                            <polygon points="90,10 160,55 90,100 20,55" fill="#fed7aa" stroke="#ea580c" stroke-width="2"/>
+                            <!-- Diagonales -->
+                            <line x1="90" y1="10" x2="90" y2="100" stroke="#0284c7" stroke-width="1.5"/>
+                            <line x1="20" y1="55" x2="160" y2="55" stroke="#0284c7" stroke-width="1.5"/>
+                            <text x="95" y="45" fill="#0284c7" font-size="10" font-weight="bold">D</text>
+                            <text x="50" y="50" fill="#0284c7" font-size="10" font-weight="bold">d</text>
+                        </svg>
+                        <div class="text-xs text-slate-700 bg-white p-3 rounded-lg border border-indigo-200 max-w-md">
+                            <p class="font-bold text-indigo-900 mb-1">Propiedad Fundamental:</p>
+                            <p>El área de un romboide o barrilete es <strong>exactamente la mitad ($\frac{1}{2}$)</strong> del área del rectángulo envolvente formado por sus diagonales: $A = \frac{D \times d}{2}$.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl">
+                    <p class="font-semibold text-slate-700 mb-3">Problema del Barrilete y Rectángulo:</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3">
+                            <span>a) Si un rectángulo envolvente tiene $40\text{ cm}^2$ de área, el romboide inscripto en él tendrá un área de:</span>
+                            <input type="text" data-ans="20" class="math-input bg-transparent" placeholder="cm²">
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span>b) Para una hoja de papel de $45\text{ cm} \times 63\text{ cm}$, el área máxima del barrilete (romboide) será:</span>
+                            <input type="text" data-ans="1417,5" data-alt="1417.5" class="math-input w-28 bg-transparent" placeholder="cm²">
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 6: Circunferencia y Círculo -->
+            <section class="bg-white rounded-2xl p-6 mb-8 sheet-shadow">
+                <div class="flex items-center space-x-3 border-b pb-3 mb-4">
+                    <span class="bg-indigo-100 text-indigo-800 font-bold px-3 py-1 rounded-lg text-sm">Págs. 209-210</span>
+                    <h3 class="font-fredoka text-xl font-bold text-slate-800">6. Perímetro de Circunferencia ($C = \pi \cdot d$) y Área del Círculo ($A = \pi \cdot r^2$)</h3>
+                    <span class="text-xs text-indigo-600 font-semibold">(Usar $\pi = 3,14$)</span>
+                </div>
+
+                <!-- AYUDA VISUAL INTERACTIVA - CÍRCULO -->
+                <div class="visual-card rounded-xl p-4 mb-5">
+                    <div class="flex items-center justify-between cursor-pointer" onclick="toggleHelp('help-circulo')">
+                        <span class="font-fredoka text-indigo-900 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-circle-dot text-indigo-600"></i> Diagrama de Circunferencia, Radio y Círculo
+                        </span>
+                        <span class="text-xs bg-indigo-600 text-white px-2.5 py-1 rounded-full font-semibold">Ver / Ocultar gráfico</span>
+                    </div>
+                    <div id="help-circulo" class="mt-3 pt-3 border-t border-indigo-200 text-sm text-indigo-950 flex flex-col md:flex-row items-center justify-around gap-4">
+                        <svg width="120" height="120" class="drop-shadow bg-white p-2 rounded-lg border border-indigo-100">
+                            <circle cx="60" cy="60" r="45" fill="#bae6fd" stroke="#0284c7" stroke-width="2"/>
+                            <!-- Radio -->
+                            <line x1="60" y1="60" x2="105" y2="60" stroke="#0369a1" stroke-width="2"/>
+                            <!-- Centro -->
+                            <circle cx="60" cy="60" r="3" fill="#0f172a"/>
+                            <text x="75" y="52" fill="#0369a1" font-size="11" font-weight="bold">r</text>
+                        </svg>
+                        <div class="text-xs text-slate-700 bg-white p-3 rounded-lg border border-indigo-200 max-w-md space-y-1">
+                            <p>• <strong>Perímetro (Longitud contorno):</strong> $C = \pi \times d = 2 \times \pi \times r$</p>
+                            <p>• <strong>Superficie (Área):</strong> $A = \pi \times r^2$</p>
+                            <p class="text-slate-500 italic">Recuerda: si te dan el Diámetro ($d$), el radio es su mitad ($r = d / 2$).</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 rounded-xl space-y-4">
+                    <div class="flex items-center space-x-3">
+                        <span class="w-80 font-medium">a) Perímetro de un anillo de diámetro $d = 3\text{ cm}$:</span>
+                        <input type="text" data-ans="9,42" data-alt="9.42" class="math-input bg-transparent" placeholder="cm">
+                    </div>
+                    
+                    <div class="flex items-center space-x-3">
+                        <span class="w-80 font-medium">b) Área de una pizza redonda de $30\text{ cm}$ de diámetro ($r = 15\text{ cm}$):</span>
+                        <input type="text" data-ans="706,5" data-alt="706.5" class="math-input bg-transparent" placeholder="cm²">
+                    </div>
+
+                    <div class="flex items-center space-x-3">
+                        <span class="w-80 font-medium">c) Superficie libre fuera de una pista circular ($r=25\text{ m}$) en un terreno cuadrado de $50\text{ m}$ de lado:</span>
+                        <input type="text" data-ans="537,5" data-alt="537.5" class="math-input bg-transparent" placeholder="m²">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Controls / Actions -->
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4 mb-12">
+                <button type="button" onclick="checkWorksheet()" class="w-full sm:w-auto bg-emerald-600 hover:bg-emerald-700 text-white font-fredoka text-xl px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-paper-plane"></i>
+                    <span>Enviar Examen y Ver Nota</span>
+                </button>
+                <button type="button" onclick="resetWorksheet()" class="w-full sm:w-auto bg-slate-400 hover:bg-slate-500 text-white font-fredoka text-xl px-6 py-3 rounded-xl shadow transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-rotate-left"></i>
+                    <span>Reiniciar</span>
+                </button>
+            </div>
+
+        </form>
+    </main>
+
+    <!-- Modal de Resultados y Notificación -->
+    <div id="results-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 sheet-shadow border-t-8 border-emerald-500 relative animate-fade-in text-center">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 text-xl font-bold w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-100">
+                ✕
+            </button>
+            
+            <span id="modal-avatar" class="text-6xl inline-block bg-indigo-50 p-3 rounded-full mb-2 border border-indigo-100">🧑‍🎓</span>
+            <h2 id="modal-student-name" class="font-fredoka text-2xl font-bold text-indigo-950">¡Examen Guardado!</h2>
+            <p id="modal-student-course" class="text-sm text-slate-500 mb-4">7mo Grado</p>
+            
+            <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 mb-4">
+                <span class="text-xs uppercase font-bold text-emerald-700 tracking-wider">Tu Calificación Final</span>
+                <div class="text-5xl font-fredoka font-bold text-emerald-600 my-1">
+                    <span id="modal-score">0</span> <span class="text-2xl text-emerald-400">/ 10</span>
+                </div>
+                <p id="modal-percent" class="text-sm text-slate-600 font-medium">Aciertos: 0 de 0 (0%)</p>
+            </div>
+
+            <div id="status-notification" class="bg-indigo-50 border border-indigo-200 text-indigo-800 text-xs rounded-xl p-3 mb-4 flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-cloud-check text-indigo-600 text-base"></i>
+                <span>Registrado automáticamente en el historial de la profesora.</span>
+            </div>
+
+            <div class="space-y-2">
+                <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-fredoka text-lg py-2.5 px-4 rounded-xl shadow transition">
+                    Revisar mis Respuestas
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MathJax for rendering fraction formulas cleanly -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Firebase Cloud Storage SDK Imports -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global in-memory storage fallback for iFrames (Google Sites compatibility)
+        window.localGradesHistory = window.localGradesHistory || [];
+
+        // Safe LocalStorage wrapper to prevent iFrame Cross-Origin Security Exceptions on Google Sites
+        function safeGetLocalStorage() {
+            try {
+                const stored = localStorage.getItem('perimetro_area_grades_history');
+                return stored ? JSON.parse(stored) : [];
+            } catch (e) {
+                console.warn("Storage restricted inside iFrame (Google Sites): using in-memory store.");
+                return window.localGradesHistory;
+            }
+        }
+
+        function safeSetLocalStorage(records) {
+            window.localGradesHistory = records;
+            try {
+                localStorage.setItem('perimetro_area_grades_history', JSON.stringify(records));
+            } catch (e) {
+                console.warn("Could not write to localStorage due to iFrame restrictions.");
+            }
+        }
+
+        // Initialize Cloud Storage if configuration exists
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'perimetro-area-7mo-app';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        
+        let db = null;
+        let auth = null;
+        let currentUser = null;
+
+        if (firebaseConfig) {
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                const authInit = typeof __initial_auth_token !== 'undefined' && __initial_auth_token 
+                    ? signInWithCustomToken(auth, __initial_auth_token)
+                    : signInAnonymously(auth);
+
+                authInit.then((cred) => {
+                    currentUser = cred.user;
+                    listenToGrades();
+                }).catch(err => {
+                    console.error("Auth Error, using local fallback:", err);
+                    loadLocalDashboard();
+                });
+            } catch(e) {
+                console.error("Firebase Initialization error:", e);
+                loadLocalDashboard();
+            }
+        } else {
+            // Load local records if no firebase config present (e.g. Google Sites embed)
+            loadLocalDashboard();
+        }
+
+        // Global function exposed to window for saving results
+        window.saveResultToCloud = async function(recordData) {
+            const newRecord = {
+                ...recordData,
+                timestamp: new Date().toISOString()
+            };
+
+            // Always update local/in-memory store for immediate display in Google Sites
+            const currentHistory = safeGetLocalStorage();
+            currentHistory.unshift(newRecord);
+            safeSetLocalStorage(currentHistory);
+            renderDashboard(currentHistory);
+
+            // Attempt Cloud Save if Firebase is configured
+            if (db && currentUser) {
+                try {
+                    const gradesCol = collection(db, 'artifacts', appId, 'public', 'data', 'grades');
+                    await addDoc(gradesCol, {
+                        ...newRecord,
+                        userId: currentUser.uid
+                    });
+                } catch (err) {
+                    console.error("Error saving score to Cloud:", err);
+                }
+            }
+        };
+
+        function listenToGrades() {
+            if (!db || !currentUser) {
+                loadLocalDashboard();
+                return;
+            }
+            try {
+                const gradesCol = collection(db, 'artifacts', appId, 'public', 'data', 'grades');
+                onSnapshot(gradesCol, (snapshot) => {
+                    const cloudRecords = [];
+                    snapshot.forEach(doc => cloudRecords.push(doc.data()));
+                    
+                    // Combine cloud records with local records removing duplicates if any
+                    const localRecords = safeGetLocalStorage();
+                    const combinedMap = new Map();
+                    
+                    [...localRecords, ...cloudRecords].forEach(item => {
+                        const key = `${item.studentName}-${item.timestamp}`;
+                        combinedMap.set(key, item);
+                    });
+
+                    const combined = Array.from(combinedMap.values());
+                    combined.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                    
+                    renderDashboard(combined);
+                }, (error) => {
+                    console.error("Dashboard subscription error, fallback to local:", error);
+                    loadLocalDashboard();
+                });
+            } catch(e) {
+                loadLocalDashboard();
+            }
+        }
+
+        function loadLocalDashboard() {
+            const localData = safeGetLocalStorage();
+            renderDashboard(localData);
+        }
+
+        function renderDashboard(records) {
+            const tbody = document.getElementById('dashboard-tbody');
+            const loading = document.getElementById('dashboard-loading');
+            const tableContainer = document.getElementById('dashboard-table-container');
+
+            if (!tbody) return;
+
+            if (!records || records.length === 0) {
+                loading.innerHTML = `<p class="text-slate-400">Aún no hay calificaciones registradas en este dispositivo.</p>`;
+                loading.classList.remove('hidden');
+                tableContainer.classList.add('hidden');
+                return;
+            }
+
+            tbody.innerHTML = records.map(r => `
+                <tr class="hover:bg-slate-800/50">
+                    <td class="p-3 font-medium flex items-center space-x-2">
+                        <span class="text-xl">${r.avatar || '🧑‍🎓'}</span>
+                        <span class="text-slate-200">${r.studentName}</span>
+                    </td>
+                    <td class="p-3 text-slate-400">${r.studentCourse}</td>
+                    <td class="p-3 text-slate-400 text-xs">${new Date(r.timestamp).toLocaleString('es-AR')}</td>
+                    <td class="p-3 text-slate-300">${r.correctItems} / ${r.totalItems}</td>
+                    <td class="p-3 text-right font-bold text-yellow-400 text-base">${r.finalScore} / 10</td>
+                </tr>
+            `).join('');
+
+            loading.classList.add('hidden');
+            tableContainer.classList.remove('hidden');
+        }
+
+        // Expose render/reload manually to window for direct triggers
+        window.refreshDashboard = loadLocalDashboard;
+    </script>
+
+    <!-- Logic JS -->
+    <script>
+        let currentAvatar = '🧑‍🎓';
+
+        function toggleHelp(id) {
+            const el = document.getElementById(id);
+            if (el) {
+                el.classList.toggle('hidden');
+            }
+        }
+
+        function selectAvatar(emoji, element) {
+            currentAvatar = emoji;
+            const options = document.querySelectorAll('.avatar-option');
+            options.forEach(opt => opt.classList.remove('avatar-selected'));
+            element.classList.add('avatar-selected');
+            updateStudentProfile();
+        }
+
+        function updateStudentProfile() {
+            const nameInput = document.getElementById('student-name-input').value.trim();
+            const courseInput = document.getElementById('student-course-input').value;
+
+            const activeAvatarEl = document.getElementById('active-avatar');
+            const activeNameEl = document.getElementById('active-name');
+            const activeCourseEl = document.getElementById('active-course');
+            const studentBadge = document.getElementById('student-badge');
+
+            activeAvatarEl.textContent = currentAvatar;
+            activeNameEl.textContent = nameInput !== "" ? nameInput : "Estudiante";
+            activeCourseEl.textContent = courseInput;
+
+            if (nameInput !== "") {
+                studentBadge.classList.remove('hidden');
+            }
+        }
+
+        function confirmProfile() {
+            const nameInput = document.getElementById('student-name-input').value.trim();
+            const courseInput = document.getElementById('student-course-input').value;
+
+            updateStudentProfile();
+            document.getElementById('student-badge').classList.remove('hidden');
+
+            document.getElementById('summary-avatar').textContent = currentAvatar;
+            document.getElementById('summary-name').textContent = nameInput !== "" ? nameInput : "Estudiante";
+            document.getElementById('summary-course').textContent = courseInput;
+
+            document.getElementById('profile-form-container').classList.add('hidden');
+            document.getElementById('profile-summary-container').classList.remove('hidden');
+        }
+
+        function editProfile() {
+            document.getElementById('profile-summary-container').classList.add('hidden');
+            document.getElementById('profile-form-container').classList.remove('hidden');
+        }
+
+        function toggleTeacherDashboard() {
+            const dash = document.getElementById('teacher-dashboard');
+            dash.classList.toggle('hidden');
+            if (!dash.classList.contains('hidden') && window.refreshDashboard) {
+                window.refreshDashboard();
+            }
+        }
+
+        function checkWorksheet() {
+            let totalItems = 0;
+            let correctItems = 0;
+
+            updateStudentProfile();
+            document.getElementById('student-badge').classList.remove('hidden');
+
+            const studentName = document.getElementById('student-name-input').value.trim() || "Estudiante Anónimo";
+            const studentCourse = document.getElementById('student-course-input').value;
+
+            // 1. Text Inputs Verification
+            const inputs = document.querySelectorAll('input[type="text"]:not(#student-name-input)');
+            inputs.forEach((input) => {
+                totalItems++;
+                const val = input.value.trim().replace(/\s+/g, '');
+                const expected = input.getAttribute('data-ans');
+                const altExpected = input.getAttribute('data-alt');
+
+                const isCorrect = val !== "" && (val === expected || (altExpected && val === altExpected));
+                if (isCorrect) {
+                    correctItems++;
+                    input.classList.remove('incorrect-input');
+                    input.classList.add('correct-input');
+                } else {
+                    input.classList.remove('correct-input');
+                    input.classList.add('incorrect-input');
+                }
+            });
+
+            // Score Calculation out of 10
+            const rawScore = (correctItems / totalItems) * 10;
+            const finalScore = Math.max(1, Math.round(rawScore * 10) / 10);
+
+            // Update sticky score badge
+            const scoreBadge = document.getElementById('score-badge');
+            const scoreVal = document.getElementById('final-score-val');
+            scoreVal.textContent = finalScore;
+            scoreBadge.classList.remove('hidden');
+
+            // Save record automatically to cloud/history
+            if (window.saveResultToCloud) {
+                window.saveResultToCloud({
+                    studentName,
+                    studentCourse,
+                    avatar: currentAvatar,
+                    finalScore,
+                    correctItems,
+                    totalItems
+                });
+            }
+
+            // Open summary result modal
+            showResultModal(studentName, studentCourse, currentAvatar, finalScore, correctItems, totalItems);
+        }
+
+        function showResultModal(name, course, avatar, score, correct, total) {
+            document.getElementById('modal-avatar').textContent = avatar;
+            document.getElementById('modal-student-name').textContent = name;
+            document.getElementById('modal-student-course').textContent = course;
+            document.getElementById('modal-score').textContent = score;
+            const percentage = Math.round((correct / total) * 100);
+            document.getElementById('modal-percent').textContent = `Aciertos: ${correct} de ${total} (${percentage}%)`;
+
+            document.getElementById('results-modal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('results-modal').classList.add('hidden');
+        }
+
+        function resetWorksheet() {
+            document.getElementById('worksheet-form').reset();
+            const inputs = document.querySelectorAll('input[type="text"]:not(#student-name-input)');
+            inputs.forEach(el => {
+                el.classList.remove('correct-input', 'incorrect-input');
+            });
+            document.getElementById('score-badge').classList.add('hidden');
+            closeModal();
+        }
+    </script>
+</body>
+</html>

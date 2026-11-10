@@ -1,0 +1,6 @@
+{
+  "name": "Geometría Interactiva 7mo - Perímetro y Área",
+  "description": "Plataforma educativa interactiva de matemática para 7mo grado con todos los ejercicios de las páginas 198 a 211, ayudas visuales, seguimiento de progreso, racha diaria, estadísticas, modo oscuro, accesibilidad y soporte multilingüe.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
